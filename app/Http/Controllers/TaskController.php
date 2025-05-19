@@ -6,6 +6,7 @@ use App\Models\Task;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -24,16 +25,16 @@ class TaskController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Auth::user()->tasks()->create([
+        Auth::user()->tasks()->create(
             $request->only('title','description')
-        ]);
+        );
 
         return redirect()->route('tasks.index');
     }
 
     public function update(Request $request, Task $task)
     {
-        $this->authorize('update', $task);
+        Gate::authorize('update', $task);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -49,7 +50,7 @@ class TaskController extends Controller
 
     public function destroy(Task $task)
     {
-        $this->authorize('delete', $task);
+        Gate::authorize('delete', $task);
         $task->delete();
         
         return redirect()->route('tasks.index');
